@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import "./style/LinkDash.css"; 
+import "./style/LinkDash.css";
 
 export default function LinkDashboard() {
   const [target, setTarget] = useState("");
@@ -10,34 +10,34 @@ export default function LinkDashboard() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  
   const BASE_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:5000";
 
-  
+ 
   const createLink = async (data) => {
     return await axios.post(`${BASE_URL}/api/links`, data);
   };
 
-  
   const getLinks = async () => {
     const res = await axios.get(`${BASE_URL}/api/links`);
     return res.data;
   };
 
-  
+ 
+  const fetchLinks = async () => {
+    try {
+      const data = await getLinks();
+      setLinks(data);
+    } catch (err) {
+      console.error(err);
+      setError("Error fetching links");
+    }
+  };
+
   useEffect(() => {
-    const fetchLinks = async () => {
-      try {
-        const data = await getLinks();
-        setLinks(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
     fetchLinks();
   }, []);
 
- 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -49,8 +49,7 @@ export default function LinkDashboard() {
       setSuccess(`Short link created: ${res.data.slug}`);
       setTarget("");
       setSlug("");
-      const updatedLinks = await getLinks();
-      setLinks(updatedLinks);
+      fetchLinks();
     } catch (err) {
       setError(err.response?.data?.error || "Error creating link");
     } finally {
@@ -58,11 +57,23 @@ export default function LinkDashboard() {
     }
   };
 
- 
+
   const copyLink = (slug) => {
     const shortUrl = `${BASE_URL}/${slug}`;
     navigator.clipboard.writeText(shortUrl);
     alert(`Copied: ${shortUrl}`);
+  };
+
+ 
+  const handleLinkClick = async (slug, target) => {
+    try {
+      await axios.post(`${BASE_URL}/api/links/${slug}/click`);
+      fetchLinks();
+      window.open(target, "_blank");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to open link");
+    }
   };
 
   return (
@@ -110,7 +121,13 @@ export default function LinkDashboard() {
               <tr key={link._id}>
                 <td>{link.slug}</td>
                 <td>
-                  <a href={link.target} target="_blank" rel="noreferrer">
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleLinkClick(link.slug, link.target);
+                    }}
+                  >
                     {link.target}
                   </a>
                 </td>

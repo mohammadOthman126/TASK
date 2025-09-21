@@ -60,12 +60,14 @@ h1, h2 {
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
 }
 
 table th, table td {
   padding: 10px;
   border: 1px solid #ccc;
   text-align: center;
+  word-break: break-word;
 }
 
 table th {
@@ -81,3 +83,53 @@ table button {
   padding: 5px 10px;
   cursor: pointer;
 }
+
+
+@media (max-width: 600px) {
+  .form input, .form button {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  table th, table td {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+
+@media (max-width: 1200px) {
+  .container {
+    max-width: 95%;
+  }
+  .form input, .form button {
+    font-size: 15px;
+    padding: 9px;
+  }
+  table th, table td {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+
+
+@media (max-width: 900px) {
+  .form {
+    gap: 8px;
+  }
+  table th, table td {
+    font-size: 13px;
+    padding: 6px;
+  }
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+
